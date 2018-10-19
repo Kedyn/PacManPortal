@@ -10,16 +10,16 @@ class GameStats:
         self.game_active = False
 
         rect = pygame.Rect(director.screen.get_rect().centerx, 10, 100, 40)
-        self.high_score_text = Text(rect, 30, (0, 180, 0), director.screen,
+        self.high_score_text = Text(rect, 30, (255, 255, 0), director.screen,
                                     "HIGH SCORE: 0")
 
-        self.high_score_text.rect.bottom = director.screen.get_rect().bottom
+        self.high_score_text.rect.bottom = director.screen.get_rect().bottom - 4
 
         rect.right = director.screen.get_rect().right - 10
-        self.score_text = Text(rect, 30, (0, 180, 0), director.screen,
+        self.score_text = Text(rect, 30, (255, 255, 0), director.screen,
                                "SCORE: 0")
 
-        self.score_text.rect.bottom = self.high_score_text.rect.bottom
+        self.score_text.rect.bottom = self.high_score_text.rect.bottom - 4
 
         self.reset()
 

@@ -5,7 +5,7 @@ from game_scene import GameScene
 
 class Game:
     def __init__(self):
-        self.director = Director((1200, 1000), "Space Invaders")
+        self.director = Director((1200, 1000), "Pacman Portal")
 
         self.menu_scene = MenuScene(self.director)
         self.game_scene = GameScene(self.director)

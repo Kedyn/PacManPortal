@@ -2,6 +2,8 @@ import pygame
 
 from scene import Scene
 from text import Text
+from pacman import Pacman
+from ghost import Ghost8
 
 
 class MenuScene(Scene):
@@ -20,6 +22,8 @@ class MenuScene(Scene):
 
         self.header = Text(text_rect, 90, director.special_text_color, director.screen,
                            "PORTAL")
+
+        self.pacman = Pacman(director.screen, 0, 30, None)
 
         menu_rect = pygame.Rect(0, 0, 100, 30)
 
