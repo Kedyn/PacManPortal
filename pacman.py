@@ -4,7 +4,7 @@ from pygame.sprite import Sprite
 
 
 class Pacman(Sprite):
-    def __init__(self, screen, position, block_size, maze):
+    def __init__(self, screen, item, block_size):
         super().__init__()
 
         self.screen = screen
@@ -18,24 +18,37 @@ class Pacman(Sprite):
         self.opened_down = pygame.transform.flip(self.opened_up, False, True)
         self.closed = pygame.image.load('assets/pacman_closed.png')
 
+        self.opened_right = pygame.transform.scale(self.opened_right,
+                                                   (block_size, block_size))
+        self.opened_left = pygame.transform.scale(self.opened_left,
+                                                  (block_size, block_size))
+        self.opened_up = pygame.transform.scale(self.opened_up,
+                                                (block_size, block_size))
+        self.opened_down = pygame.transform.scale(self.opened_down,
+                                                  (block_size, block_size))
+        self.closed = pygame.transform.scale(self.closed,
+                                             (block_size, block_size))
+
         self.image = self.closed
 
         self.rect = self.image.get_rect()
 
         self.block_size = block_size
 
-        self.rect.x = int(position % self.cols) * block_size
-        self.rect.y = int(position / self.cols) * block_size
+        self.rect.x = item['j'] * block_size
+        self.rect.y = item['i'] * block_size
 
         # 0 = no movement, 1 = left, 2 = up, 3 = right, 4 = down
         self.direction = 0
         self.next_direction = 0
 
-        self.maze = maze
-
         self.portals = []
 
         self.portal_direction = 0
+
+    def cooToItem(self):
+        return (int(self.rect.y / self.block_size),
+                int(self.rect.x / self.block_size))
 
     def isBrick(self, direction):
         block = (0, 0, 100, 255)

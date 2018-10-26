@@ -10,7 +10,7 @@ class Director:
 
         pygame.display.set_caption(title)
 
-        self.scene_list = None
+        self.scene_list = {}
         self.scene = None
         self.quit = False
 
@@ -36,6 +36,9 @@ class Director:
                 pygame.display.flip()
 
             if self.quit:
+                for key, scene in self.scene_list.items():
+                    if scene:
+                        scene.exit()
                 sys.exit()
 
     def set_scene(self, scene_name):

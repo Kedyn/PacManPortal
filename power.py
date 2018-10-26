@@ -4,17 +4,13 @@ from pygame.sprite import Sprite
 
 
 class Power(Sprite):
-    def __init__(self, screen, position, block_size):
+    def __init__(self, screen, item, block_size):
         super().__init__()
 
         self.screen = screen
 
-        self.block_size = block_size
-
-        cols = int(screen.get_rect().right / block_size)
-
-        x = int(position % cols) * block_size
-        y = int(position / cols) * block_size
+        x = item['j'] * block_size
+        y = item['i'] * block_size
 
         self.rect = pygame.Rect(0, 0, int(block_size / 2), int(block_size / 2))
 

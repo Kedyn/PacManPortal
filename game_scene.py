@@ -17,29 +17,41 @@ class GameScene(Scene):
 
         self.maze = Maze("assets/maze.txt", director.screen)
 
-        characters = self.maze.get_characters()
-
-        self.blinky = Ghost(director.screen, characters['blinky'],
+        self.blinky = Ghost(director.screen, self.maze.blinky,
                             self.maze.block_size, 1)
-        self.inkey = Ghost(director.screen, characters['inkey'],
+        self.inkey = Ghost(director.screen, self.maze.inkey,
                            self.maze.block_size, 2)
-        self.pinky = Ghost(director.screen, characters['pinky'],
+        self.pinky = Ghost(director.screen, self.maze.pinky,
                            self.maze.block_size, 3)
-        self.clyde = Ghost(director.screen, characters['clyde'],
+        self.clyde = Ghost(director.screen, self.maze.clyde,
                            self.maze.block_size, 4)
 
-        self.pacman = Pacman(director.screen, characters['pacman'],
-                             self.maze.block_size, self.maze.rows)
+        self.pacman = Pacman(director.screen, self.maze.pacman,
+                             self.maze.block_size)
 
-        self.food = characters['food']
-        self.power = characters['power']
+        self.food = self.maze.food
+        self.powers = self.maze.powers
 
         self.reset()
 
-        self.old_ticks = pygame.time.get_ticks()
+        old_ticks = pygame.time.get_ticks()
+
+        self.blinky_time = old_ticks
+        self.inkey_time = old_ticks
+        self.pinky_time = old_ticks
+        self.clyde_time = old_ticks
+
+        self.blinky_timer = 5000
+        self.inkey_timer = 10000
+        self.pinky_timer = 15000
+        self.clyde_timer = 20000
+
+    def exit(self):
+        self.game_stats.save_scores()
 
     def reset(self):
         self.game_stats.reset()
+        self.maze.load_file("assets/maze.txt")
 
     def keydown(self, key):
         if key == pygame.K_LEFT:
@@ -72,19 +84,35 @@ class GameScene(Scene):
             self.pacman.portal_direction = 4
 
     def update(self):
-        self.pacman.update()
+        if self.food or self.powers:
+            self.pacman.update()
 
-        for food in self.food:
-            if food.rect.colliderect(self.pacman.rect):
-                self.food.remove(food)
-                self.game_stats.score += 10
+            for food in self.food:
+                if food.rect.colliderect(self.pacman.rect):
+                    self.food.remove(food)
+                    self.game_stats.score += 10
 
-        for power in self.power:
-            if power.rect.colliderect(self.pacman.rect):
-                self.power.remove(power)
-                self.game_stats.score += 50
+            for power in self.powers:
+                if power.rect.colliderect(self.pacman.rect):
+                    self.powers.remove(power)
+                    self.game_stats.score += 50
 
-        self.game_stats.update()
+            pacman = self.pacman.cooToItem()
+            blinky = self.maze.grid[pacman[0]][pacman[1]]
+
+            ticks = pygame.time.get_ticks()
+            if self.blinky_timer <= ticks - self.blinky_time:
+                self.blinky.update(self.maze.grid, blinky)
+            if self.inkey_timer <= ticks - self.inkey_time:
+                self.inkey.update(self.maze.grid,
+                                  self.maze.grid[pacman[0]][pacman[1]])
+            if self.pinky_timer <= ticks - self.pinky_time:
+                self.pinky.update(self.maze.grid,
+                                  self.maze.grid[pacman[0]][pacman[1]])
+            if self.clyde_timer <= ticks - self.clyde_time:
+                self.clyde.update(self.maze.grid,
+                                  self.maze.grid[pacman[0]][pacman[1]])
+            self.game_stats.update()
 
     def render(self):
         self.director.screen.fill(self.background)
@@ -95,7 +123,7 @@ class GameScene(Scene):
         for food in self.food:
             food.render()
 
-        for power in self.power:
+        for power in self.powers:
             power.render()
 
         self.blinky.render()

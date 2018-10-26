@@ -8,87 +8,69 @@ class Maze:
     def __init__(self, file, screen):
         self.screen = screen
 
-        rows = []
-        with open(file, 'r') as f:
-            rows = f.readlines()
+        self.block_size = 30
+        self.load_file(file)
 
-        self.rows = []
+    def load_file(self, file):
+        rows = open(file, 'r').read().split('\n')
+
+        self.food = []
+        self.powers = []
+
+        self.grid = []
         for i, row in enumerate(rows):
             col_content = []
             for j, col in enumerate(row):
-                item = {'i': i, 'j': j, 'f': 0, 'g': 0, 'h': 0, 'type': col,
-                        'neighbors': [], 'previous': None}
+                item = {'i': int(i), 'j': int(j), 'f': 0, 'g': 0, 'h': 0,
+                        'type': col, 'neighbors': [], 'previous': None}
+                if col is 'c':
+                    self.pacman = item
+                elif col is '1':
+                    self.blinky = item
+                elif col is '2':
+                    self.inkey = item
+                elif col is '3':
+                    self.pinky = item
+                elif col is '4':
+                    self.clyde = item
+                elif col is 'n':
+                    self.food.append(Food(self.screen, item, self.block_size))
+                elif col is 'p':
+                    self.powers.append(Power(self.screen, item,
+                                       self.block_size))
                 col_content.append(item)
-            self.rows.append(col_content)
+            self.grid.append(col_content)
 
         self.addNeighbors()
 
-        self.block_size = 30
-
     def addNeighbors(self):
-        rows = len(self.rows)
-        cols = len(self.rows[0])
+        rows = len(self.grid)
+        cols = len(self.grid[0])
+        non_walkable = ['x']
         for i in range(rows):
             for j in range(cols):
-                neighbors = self.rows[i][j]['neighbors']
-
-                if i < cols - 1:
-                    new_neighbor = self.rows[i + 1][j]
-                    if new_neighbor['type'] is not 'x' or \
-                            new_neighbor['type'] is not '.':
-                        neighbors.append(new_neighbor)
-                if i > 0:
-                    new_neighbor = self.rows[i - 1][j]
-                    if new_neighbor['type'] is not 'x' or \
-                            new_neighbor['type'] is not '.':
-                        neighbors.append(new_neighbor)
-                if j < rows - 1:
-                    new_neighbor = self.rows[i][j + 1]
-                    if new_neighbor['type'] is not 'x' or \
-                            new_neighbor['type'] is not '.':
-                        neighbors.append(new_neighbor)
-                if j > 0:
-                    new_neighbor = self.rows[i][j - 1]
-                    if new_neighbor['type'] is not 'x' or \
-                            new_neighbor['type'] is not '.':
-                        neighbors.append(new_neighbor)
-
-    def get_characters(self):
-        r, c, chars = 0, 0, {}
-
-        chars.update({'fence': [], 'food': [], 'power': []})
-
-        for row in self.rows:
-            for block in row:
-                if block['type'] is 'f':
-                    fence = chars['fence']
-                    fence.append(r * c)
-                elif block['type'] is 'c':
-                    chars['pacman'] = r + c
-                elif block['type'] is '1':
-                    chars['blinky'] = r + c
-                elif block['type'] is '2':
-                    chars['inkey'] = r + c
-                elif block['type'] is '3':
-                    chars['pinky'] = r + c
-                elif block['type'] is '4':
-                    chars['clyde'] = r + c
-                elif block['type'] is 'n':
-                    food = chars['food']
-                    food.append(Food(self.screen, r + c, self.block_size))
-                elif block['type'] is 'p':
-                    power = chars['power']
-                    power.append(Power(self.screen, r + c, self.block_size))
-                c += 1
-            r += c - 1
-            c = 0
-
-        return chars
+                if self.grid[i][j]['type'] not in non_walkable:
+                    if i < rows - 1:
+                        new_neighbor = self.grid[i + 1][j]
+                        if new_neighbor['type'] not in non_walkable:
+                            self.grid[i][j]['neighbors'].append(new_neighbor)
+                    if i > 0:
+                        new_neighbor = self.grid[i - 1][j]
+                        if new_neighbor['type'] not in non_walkable:
+                            self.grid[i][j]['neighbors'].append(new_neighbor)
+                    if j < cols - 1:
+                        new_neighbor = self.grid[i][j + 1]
+                        if new_neighbor['type'] not in non_walkable:
+                            self.grid[i][j]['neighbors'].append(new_neighbor)
+                    if j > 0:
+                        new_neighbor = self.grid[i][j - 1]
+                        if new_neighbor['type'] not in non_walkable:
+                            self.grid[i][j]['neighbors'].append(new_neighbor)
 
     def render(self):
         x, y, b = 0, 0, self.block_size
 
-        for row in self.rows:
+        for row in self.grid:
             for block in row:
                 if block['type'] is 'x':
                     # This is a brick
