@@ -73,6 +73,19 @@ class Ghost(Sprite):
         self.last_target = {'i': item['i'], 'j': item['j']}
         self.path = []
 
+        self.set_state('normal')
+
+    def set_state(self, state):
+        self.state = state
+        self.old_time = pygame.time.get_ticks()
+
+        if state is 'normal':
+            self.timer = 0
+            self.image = self.normal
+        elif state is 'vulnerable':
+            self.timer = 50000
+            self.image = self.blue_normal
+
     def cooToItem(self):
         return (int(self.rect.y / self.block_size),
                 int(self.rect.x / self.block_size))
@@ -132,6 +145,8 @@ class Ghost(Sprite):
             self.image = self.step
         elif self.image is self.blue_normal:
             self.image = self.blue_step
+            if self.state is 'vulnerable' and \
+                self.timer <
         elif self.image is self.white_normal:
             self.image = self.white_step
         elif self.image is self.step:
@@ -145,7 +160,7 @@ class Ghost(Sprite):
 
     def render(self):
         self.screen.blit(self.image, self.rect)
-        
+
         if self.image is not self.blue_normal and \
                 self.image is not self.blue_step and \
                 self.image is not self.white_normal and \

@@ -96,6 +96,10 @@ class GameScene(Scene):
                 if power.rect.colliderect(self.pacman.rect):
                     self.powers.remove(power)
                     self.game_stats.score += 50
+                    self.blinky.set_state('vulnerable')
+                    self.inkey.set_state('vulnerable')
+                    self.pinky.set_state('vulnerable')
+                    self.clyde.set_state('vulnerable')
 
             pacman = self.pacman.cooToItem()
             blinky = self.maze.grid[pacman[0]][pacman[1]]
